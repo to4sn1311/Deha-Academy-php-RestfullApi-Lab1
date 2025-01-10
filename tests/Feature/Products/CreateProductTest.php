@@ -3,9 +3,16 @@
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
+use App\Models\User;
 
 class CreateProductTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+    }
+
     /** @test */
     public function user_can_create_product_if_data_is_valid()
     {
@@ -16,7 +23,9 @@ class CreateProductTest extends TestCase
             'price' => $this->faker->randomFloat(2, 100, 1000),
         ];
 
-        $response = $this->json('POST', route('products.store'), $dataCreated);
+        $response = $this->actingAs($this->user)
+            ->json('POST', route('products.store'), $dataCreated);
+
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson(fn(AssertableJson $json) =>
             $json->has('data', fn(AssertableJson $json) =>
@@ -30,7 +39,6 @@ class CreateProductTest extends TestCase
             'slug' => $dataCreated['slug'],
             'price' => $dataCreated['price'],
         ]);
-
     }
 
     /** @test */
@@ -43,8 +51,25 @@ class CreateProductTest extends TestCase
             'price' => '',
         ];
 
-        $response = $this->json('POST', route('products.store'), $dataCreated);
+        $response = $this->actingAs($this->user)
+            ->json('POST', route('products.store'), $dataCreated);
+
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertJsonValidationErrors(['name', 'description', 'slug', 'price']);
+    }
+
+    /** @test */
+    public function unauthenticated_user_cannot_create_product()
+    {
+        $dataCreated = [
+            'name' => $this->faker->name,
+            'description' => $this->faker->sentence,
+            'slug' => $this->faker->slug,
+            'price' => $this->faker->randomFloat(2, 100, 1000),
+        ];
+
+        $response = $this->json('POST', route('products.store'), $dataCreated);
+
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 }

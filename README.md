@@ -32,3 +32,12 @@
 
 ![image](https://github.com/user-attachments/assets/90c70eb2-3edf-4620-aa0e-559ffb2c0eda)
 
+## Test
+
+### Delete Product Test
+
+![image](https://github.com/user-attachments/assets/12dc652b-9af0-40fe-a6fd-a576357563ee)
+
+### Create Product Test
+
+![image](https://github.com/user-attachments/assets/dc214eeb-2abc-4b69-afa6-d4c568ef4cd5)
